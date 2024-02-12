@@ -1,82 +1,118 @@
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
         children: [
-          ListTile(
-            title: const Text('Account'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AccountSettingsPage()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Notifications'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const NotificationSettingsPage()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Privacy & Security'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const PrivacySecuritySettingsPage()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Help and Support'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HelpSupportPage()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('About'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AboutPage()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Logout'),
-            onTap: () {
-              // Implement logout functionality
-            },
+          _buildOption('Account', Icons.account_circle_outlined, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AccountSettingsPage()),
+            );
+          }),
+          _buildOption('Notifications', Icons.notifications_outlined, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NotificationSettingsPage()),
+            );
+          }),
+          _buildOption('Privacy & Security', Icons.security_outlined, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const PrivacySecuritySettingsPage()),
+            );
+          }),
+          _buildOption('Help and Support', Icons.help_outline, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HelpSupportPage()),
+            );
+          }),
+          _buildOption('About', Icons.info_outlined, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AboutPage()),
+            );
+          }),
+          _buildLogoutOption(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOption(String label, IconData icon, VoidCallback onTap) {
+  return InkWell(
+    onTap: onTap,
+    child: Container(
+      margin: const EdgeInsets.all(9.0),
+      padding: const EdgeInsets.all(2.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
           ),
         ],
+      ),
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(label),
+      ),
+    ),
+  );
+}
+
+  Widget _buildLogoutOption() {
+    return Container(
+      margin: const EdgeInsets.all(9.0),
+      padding: const EdgeInsets.all(2.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: const ListTile(
+        leading: Icon(
+            Icons.logout,
+            color: Colors.red,
+          ),
+        title: Text(
+          'Logout',
+          style: TextStyle(
+            color: Colors.red,
+          ),
+        ),
       ),
     );
   }
 }
 
 class AccountSettingsPage extends StatefulWidget {
-  const AccountSettingsPage({Key? key}) : super(key: key);
+  const AccountSettingsPage({super.key});
 
   @override
   AccountSettingsPageState createState() => AccountSettingsPageState();
 }
 
 class AccountSettingsPageState extends State<AccountSettingsPage> {
-  // Sample user details (replace with your actual user data)
-  String name = 'John Doe';
-  String username = 'johndoe';
-  String email = 'john.doe@example.com';
+  String name = 'Poncholo Riego de Dios';
+  String username = 'poncholoriegodedios';
+  String email = 'poncholo.boi@example.com';
   String phoneNumber = '+1 123-456-7890';
 
   Map<String, bool> isEditing = {
@@ -107,7 +143,7 @@ class AccountSettingsPageState extends State<AccountSettingsPage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(29.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -121,7 +157,7 @@ class AccountSettingsPageState extends State<AccountSettingsPage> {
                 backgroundImage: AssetImage('assets/default_profile_icon.jpg'),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             // User Profile Details
             _buildEditableField('Name', name, Icons.person),
             _buildEditableField('Username', username, Icons.account_circle),
@@ -188,7 +224,7 @@ class AccountSettingsPageState extends State<AccountSettingsPage> {
 }
 
 class NotificationSettingsPage extends StatefulWidget {
-  const NotificationSettingsPage({Key? key}) : super(key: key);
+  const NotificationSettingsPage({super.key});
 
   @override
   NotificationSettingsPageState createState() => NotificationSettingsPageState();
@@ -268,7 +304,7 @@ class NotificationSettingsPageState extends State<NotificationSettingsPage> {
 }
 
 class PrivacySecuritySettingsPage extends StatefulWidget {
-  const PrivacySecuritySettingsPage({Key? key}) : super(key: key);
+  const PrivacySecuritySettingsPage({super.key});
 
   @override
   PrivacySecuritySettingsPageState createState() => PrivacySecuritySettingsPageState();
@@ -278,6 +314,13 @@ class PrivacySecuritySettingsPageState extends State<PrivacySecuritySettingsPage
   bool? twoFactorAuthentication = false;
   bool? authenticationApp = false;
   bool? textMessage = false;
+
+  // Fields for change password
+  TextEditingController oldPasswordController = TextEditingController();
+  TextEditingController newPasswordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
+  bool showChangePasswordFields = false;
 
   @override
   Widget build(BuildContext context) {
@@ -290,21 +333,14 @@ class PrivacySecuritySettingsPageState extends State<PrivacySecuritySettingsPage
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildChangePasswordButton(),
-            const SizedBox(height: 16),
             _buildTwoFactorAuthenticationSwitch(),
+            const SizedBox(height: 16),
+            _buildChangePasswordButton(),
+            const SizedBox(height: 30),
+            _buildChangePasswordFields(),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildChangePasswordButton() {
-    return ElevatedButton(
-      onPressed: () {
-        // Implement change password functionality
-      },
-      child: const Text('Change Password'),
     );
   }
 
@@ -312,11 +348,7 @@ class PrivacySecuritySettingsPageState extends State<PrivacySecuritySettingsPage
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Two-Factor Authentication',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 2),
         SwitchListTile(
           title: const Text('Enable Two-Factor Authentication'),
           value: twoFactorAuthentication ?? false,
@@ -358,10 +390,70 @@ class PrivacySecuritySettingsPageState extends State<PrivacySecuritySettingsPage
       ),
     );
   }
+
+  Widget _buildChangePasswordButton() {
+    return InkWell(
+      onTap: () {
+        // Toggle the visibility of change password fields
+        setState(() {
+          showChangePasswordFields = !showChangePasswordFields;
+        });
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: const Text(
+          'Change Password',
+          style: TextStyle(
+            fontSize: 16.0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChangePasswordFields() {
+    return Visibility(
+      visible: showChangePasswordFields,
+      child: Column(
+        children: [
+          _buildPasswordTextField(oldPasswordController, 'Old Password'),
+          _buildPasswordTextField(newPasswordController, 'New Password'),
+          _buildPasswordTextField(confirmPasswordController, 'Confirm Password'),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              // Change password logic here
+            },
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPasswordTextField(TextEditingController controller, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextField(
+        controller: controller,
+        obscureText: true,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class HelpSupportPage extends StatelessWidget {
-  const HelpSupportPage({Key? key}) : super(key: key);
+  const HelpSupportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -377,7 +469,7 @@ class HelpSupportPage extends StatelessWidget {
 }
 
 class AboutPage extends StatelessWidget {
-  const AboutPage({Key? key}) : super(key: key);
+  const AboutPage({super.key});
 
   @override
   Widget build(BuildContext context) {

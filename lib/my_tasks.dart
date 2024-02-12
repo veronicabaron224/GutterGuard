@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MyTasksPage extends StatefulWidget {
-  const MyTasksPage({Key? key}) : super(key: key);
+  const MyTasksPage({super.key});
 
   @override
   MyTasksPageState createState() => MyTasksPageState();
@@ -31,12 +31,7 @@ class MyTasksPageState extends State<MyTasksPage> {
           child: ListView.builder(
             itemCount: tasks.length,
             itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(tasks[index].title),
-                onTap: () {
-                  _navigateToTaskDetails(tasks[index], isCompleted: false);
-                },
-              );
+              return _buildTaskItem(tasks[index], isCompleted: false);
             },
           ),
         ),
@@ -53,34 +48,90 @@ class MyTasksPageState extends State<MyTasksPage> {
     );
   }
 
+  Widget _buildTaskItem(Task task, {required bool isCompleted}) {
+    return InkWell(
+      onTap: () {
+        _navigateToTaskDetails(task, isCompleted: isCompleted);
+      },
+      child: Container(
+        margin: const EdgeInsets.all(9.0),
+        padding: const EdgeInsets.all(3.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0),
+          color: isCompleted ? Colors.grey[200] : Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ListTile(
+          title: Text(task.title),
+        ),
+      ),
+    );
+  }
+
   Widget _buildCompletedTasksLabel() {
-    return ListTile(
-      title: const Text('Completed Tasks'),
+    return InkWell(
       onTap: () {
         setState(() {
           showCompletedTasks = !showCompletedTasks;
         });
       },
+      child: Container(
+        margin: const EdgeInsets.all(9.0),
+        padding: const EdgeInsets.all(3.0),
+        child: const ListTile(
+          title: Text(
+            'Completed Tasks',
+            style: TextStyle(
+              fontWeight: FontWeight.bold, // Make the text bold
+            ),
+          ),
+        ),
+      ),
     );
   }
 
   List<Widget> _buildCompletedTasksList() {
     return completedTasks.map((completedTask) {
-      return ListTile(
-        title: Text(completedTask.title),
+      return InkWell(
         onTap: () {
           _navigateToTaskDetails(completedTask, isCompleted: true);
         },
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                _setTaskAsIncomplete(completedTask);
-              },
-              child: const Text('Set as Incomplete'),
+        child: Container(
+          margin: const EdgeInsets.all(9.0),
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 3,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ListTile(
+            title: Text(completedTask.title),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    _setTaskAsIncomplete(completedTask);
+                  },
+                  child: const Text('Set as Incomplete'),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     }).toList();
@@ -120,7 +171,7 @@ class TaskDetailsPage extends StatelessWidget {
   final Task task;
   final bool isCompleted;
 
-  const TaskDetailsPage({Key? key, required this.task, required this.isCompleted}) : super(key: key);
+  const TaskDetailsPage({super.key, required this.task, required this.isCompleted});
 
   @override
   Widget build(BuildContext context) {

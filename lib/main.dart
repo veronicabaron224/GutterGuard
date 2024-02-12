@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'my_tasks.dart';
 import 'home.dart';
 import 'locations.dart';
@@ -9,15 +10,16 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'GutterGuard',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orangeAccent),
         useMaterial3: true,
+        textTheme: GoogleFonts.poppinsTextTheme(),
       ),
       home: const MyHomePage(),
     );
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -46,9 +48,21 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(pageTitles[_currentPageIndex]),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100.0),
+        child: Container(
+          padding: const EdgeInsets.only(left: 20.0, bottom: 15.0),
+          alignment: Alignment.bottomLeft,
+          color: Colors.grey[40],
+          child: Text(
+            pageTitles[_currentPageIndex],
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.bold,
+              fontSize: 28.0,
+            ),
+          ),
+        ),
       ),
       body: PageView(
         controller: _pageController,
@@ -64,7 +78,9 @@ class _MyHomePageState extends State<MyHomePage> {
           SettingsPage(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: SizedBox(
+      height: 65.0, // Adjust the height as needed
+      child: BottomNavigationBar(
         currentIndex: _currentPageIndex,
         items: const [
           BottomNavigationBarItem(
@@ -92,8 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
           _pageController.jumpToPage(index);
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   @override
   void dispose() {
