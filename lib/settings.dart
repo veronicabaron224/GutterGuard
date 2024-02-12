@@ -5,10 +5,53 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Settings Page'),
+    return Scaffold(
+      body: ListView(
+        children: [
+          ListTile(
+            title: const Text('Account'),
+            onTap: () {
+              // Handle Account settings
+            },
+          ),
+          ListTile(
+            title: const Text('Notifications'),
+            onTap: () {
+              // Handle Notifications settings
+            },
+          ),
+          ListTile(
+            title: const Text('Privacy & Security'),
+            onTap: () {
+              // Handle Privacy & Security settings
+            },
+          ),
+          ListTile(
+            title: const Text('Help and Support'),
+            onTap: () {
+              // Handle Help and Support settings
+            },
+          ),
+          ListTile(
+            title: const Text('About'),
+            onTap: () {
+              // Handle About settings
+            },
+          ),
+          ListTile(
+            title: const Text('Logout'),
+            onTap: () {
+              // Handle Logout
+            },
+          ),
+        ],
       ),
     );
   }
+}
+
+void main() {
+  runApp(const MaterialApp(
+    home: SettingsPage(),
+  ));
 }
