@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'my_tasks.dart';
+// import 'my_tasks.dart';
+import 'about.dart';
 import 'home.dart';
 import 'locations.dart';
-import 'settings.dart';
+// import 'settings.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentPageIndex = 0;
   late PageController _pageController;
 
-  final List<String> pageTitles = ['Home', 'Locations', 'My Tasks', 'Settings'];
+  final List<String> pageTitles = ['Home', 'Locations', 'About'];
 
   @override
   void initState() {
@@ -75,8 +76,9 @@ class _MyHomePageState extends State<MyHomePage> {
         children: const [
           HomeContent(),
           LocationsPage(),
-          MyTasksPage(),
-          SettingsPage(),
+          AboutPage(),
+          // MyTasksPage(),
+          // SettingsPage(),
         ],
       ),
       bottomNavigationBar: SizedBox(
@@ -93,13 +95,17 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Locations',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.check_box),
-            label: 'My Tasks',
+            icon: Icon(Icons.info),
+            label: 'About',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.check_box),
+          //   label: 'My Tasks',
+          // ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.settings),
+          //   label: 'Settings',
+          // ),
         ],
         selectedItemColor: Colors.orangeAccent,
         unselectedItemColor: Colors.grey,

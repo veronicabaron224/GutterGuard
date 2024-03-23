@@ -12,14 +12,14 @@ class HomeContent extends StatelessWidget {
         margin: const EdgeInsets.all(18.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: const Offset(0, 3),
-            ),
-          ],
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.grey.withOpacity(0.2),
+          //     spreadRadius: 5,
+          //     blurRadius: 7,
+          //     offset: const Offset(0, 3),
+          //   ),
+          // ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20.0),

@@ -92,4 +92,6 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
   assets:
+   - assets/default_profile_icon.jpg
    - assets/united_nations_gutter.jpg
+   - assets/pedro_gil_gutter.jpg

@@ -6,7 +6,7 @@ class GutterLocation {
   final String imagePath;
   final String address;
   final bool isClogged;
-  final String maintenanceStatus;
+  final bool maintenanceStatus;
 
   GutterLocation({
     required this.name,
@@ -18,7 +18,7 @@ class GutterLocation {
 }
 
 class LocationsPage extends StatefulWidget {
-  const LocationsPage({super.key});
+  const LocationsPage({Key? key}) : super(key: key);
 
   @override
   LocationsPageState createState() => LocationsPageState();
@@ -38,7 +38,14 @@ class LocationsPageState extends State<LocationsPage> {
       imagePath: 'assets/united_nations_gutter.jpg',
       address: 'United Nations Street, City',
       isClogged: true,
-      maintenanceStatus: 'Currently assigned to Poncholo Riego de Dios',
+      maintenanceStatus: false,
+    ),
+    GutterLocation(
+      name: 'Pedro Gil',
+      imagePath: 'assets/pedro_gil_gutter.jpg',
+      address: 'Pedro Gil Streets, Manila',
+      isClogged: false,
+      maintenanceStatus: true,
     ),
     // Add more gutter locations as needed
     // ...
@@ -112,16 +119,23 @@ class LocationsPageState extends State<LocationsPage> {
   }
 }
 
-class GutterDetailsPage extends StatelessWidget {
+class GutterDetailsPage extends StatefulWidget {
   final GutterLocation location;
 
-  const GutterDetailsPage({super.key, required this.location});
+  const GutterDetailsPage({Key? key, required this.location}) : super(key: key);
+
+  @override
+  _GutterDetailsPageState createState() => _GutterDetailsPageState();
+}
+
+class _GutterDetailsPageState extends State<GutterDetailsPage> {
+  String comment = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(location.name),
+        title: Text(widget.location.name),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -129,20 +143,47 @@ class GutterDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.asset(
-              location.imagePath,
+              widget.location.imagePath,
               width: 200,
               height: 200,
               fit: BoxFit.cover,
             ),
             const SizedBox(height: 16),
-            Text('Address: ${location.address}'),
-            Text('Status: ${location.isClogged ? 'Clogged' : 'Clear'}'),
-            Text('Maintenance Status: ${location.maintenanceStatus}'),
+            Text('Address: ${widget.location.address}'),
+            Text('Status: ${widget.location.isClogged ? 'Clogged' : 'Clear'}'),
+            Text('Maintenance: ${widget.location.maintenanceStatus ? 'In Progress' : 'Unassigned'}'),
             // Add more details as needed
             const SizedBox(height: 16),
-            // Comment section (you can add more features here)
-            const Text('Comments:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            // Add your comment section UI and logic here
+            // Comment section
+            const Text(
+              'Comments:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  comment = value;
+                });
+              },
+              decoration: const InputDecoration(
+                hintText: 'Write your comment...',
+              ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                if (comment.isNotEmpty) {
+                  Text(
+                    'Posted comment: $comment',
+                    // Other properties like style, alignment, etc. can be added here
+                  );
+                  setState(() {
+                    comment = '';
+                  });
+                }
+              },
+              child: const Text('Confirm'),
+            ),
           ],
         ),
       ),

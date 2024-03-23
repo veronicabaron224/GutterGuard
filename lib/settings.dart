@@ -6,41 +6,43 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: [
-          _buildOption('Account', Icons.account_circle_outlined, () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AccountSettingsPage()),
-            );
-          }),
-          _buildOption('Notifications', Icons.notifications_outlined, () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const NotificationSettingsPage()),
-            );
-          }),
-          _buildOption('Privacy & Security', Icons.security_outlined, () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const PrivacySecuritySettingsPage()),
-            );
-          }),
-          _buildOption('Help and Support', Icons.help_outline, () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const HelpSupportPage()),
-            );
-          }),
-          _buildOption('About', Icons.info_outlined, () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AboutPage()),
-            );
-          }),
-          _buildLogoutOption(),
-        ],
-      ),
+      body: SingleChildScrollView(
+        child: Column (
+          children: [
+            _buildOption('Account', Icons.account_circle_outlined, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AccountSettingsPage()),
+              );
+            }),
+            _buildOption('Notifications', Icons.notifications_outlined, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NotificationSettingsPage()),
+              );
+            }),
+            _buildOption('Privacy & Security', Icons.security_outlined, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PrivacySecuritySettingsPage()),
+              );
+            }),
+            _buildOption('Help and Support', Icons.help_outline, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HelpSupportPage()),
+              );
+            }),
+            _buildOption('About', Icons.info_outlined, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AboutPage()),
+              );
+            }),
+            _buildLogoutOption(),
+          ],
+        ),
+      )
     );
   }
 
@@ -48,23 +50,15 @@ class SettingsPage extends StatelessWidget {
   return InkWell(
     onTap: onTap,
     child: Container(
-      margin: const EdgeInsets.all(9.0),
+      margin: const EdgeInsets.all(4.0),
       padding: const EdgeInsets.all(2.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: ListTile(
         leading: Icon(icon),
         title: Text(label),
+        trailing: const Text(
+          '>',
+          style: TextStyle(fontSize: 20),
+        ),
       ),
     ),
   );
@@ -72,20 +66,8 @@ class SettingsPage extends StatelessWidget {
 
   Widget _buildLogoutOption() {
     return Container(
-      margin: const EdgeInsets.all(9.0),
+      margin: const EdgeInsets.all(4.0),
       padding: const EdgeInsets.all(2.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: const ListTile(
         leading: Icon(
             Icons.logout,

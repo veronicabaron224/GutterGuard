@@ -54,22 +54,14 @@ class MyTasksPageState extends State<MyTasksPage> {
         _navigateToTaskDetails(task, isCompleted: isCompleted);
       },
       child: Container(
-        margin: const EdgeInsets.all(9.0),
-        padding: const EdgeInsets.all(3.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
-          color: isCompleted ? Colors.grey[200] : Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
+        margin: const EdgeInsets.all(1.0),
+        padding: const EdgeInsets.all(2.5),
         child: ListTile(
           title: Text(task.title),
+          trailing: const Text(
+            '>',
+            style: TextStyle(fontSize: 20),
+          ),
         ),
       ),
     );
