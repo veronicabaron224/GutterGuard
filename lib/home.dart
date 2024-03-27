@@ -27,9 +27,26 @@ class HomeContent extends StatelessWidget {
             width: double.infinity,
             height: 300.0,
             child: FlutterMap(
-              options: const MapOptions(
-                initialCenter: LatLng(14.5825, 120.9846),
+              options: MapOptions(
+                initialCenter: const LatLng(14.5825, 120.9846),
                 initialZoom: 15,
+                cameraConstraint: CameraConstraint.contain(
+                  bounds: LatLngBounds(
+                    const LatLng(14.4137, 120.9384), // Southwest coordinate (Manila)
+                    const LatLng(14.7176, 121.1077), // Northeast coordinate (Manila)
+                  ),
+                ),
+                interactionOptions: const InteractionOptions(
+                  enableScrollWheel: true,
+                  rotationThreshold: 20.0,
+                  pinchZoomThreshold: 0.5,
+                  pinchMoveThreshold: 40.0,
+                  enableMultiFingerGestureRace: true,
+                  debugMultiFingerGestureWinner: true,
+                  pinchZoomWinGestures: MultiFingerGesture.pinchZoom,
+                  pinchMoveWinGestures: MultiFingerGesture.pinchMove,
+                  rotationWinGestures: MultiFingerGesture.rotate,
+                ),
               ),
               children: [
                 TileLayer(
