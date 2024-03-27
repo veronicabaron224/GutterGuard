@@ -51,17 +51,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100.0),
+        preferredSize: const Size.fromHeight(80.0),
         child: Container(
-          padding: const EdgeInsets.only(left: 20.0, bottom: 15.0),
-          alignment: Alignment.bottomLeft,
+          padding: const EdgeInsets.only(top: 25.0, bottom: 0.0),
+          alignment: Alignment.center,
           color: Colors.grey[40],
           child: Text(
             pageTitles[_currentPageIndex],
             style: const TextStyle(
               fontFamily: 'Poppins',
-              fontWeight: FontWeight.bold,
-              fontSize: 28.0,
+              fontSize: 21.0,
             ),
           ),
         ),

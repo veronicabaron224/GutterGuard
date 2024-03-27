@@ -9,7 +9,7 @@ class HomeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        margin: const EdgeInsets.all(18.0),
+        margin: const EdgeInsets.symmetric(horizontal: 30.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
           // boxShadow: [

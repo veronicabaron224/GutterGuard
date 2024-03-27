@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "122381802302",
+    "firebase_url": "https://dp-gutterguard-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "dp-gutterguard",
+    "storage_bucket": "dp-gutterguard.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122381802302:android:51e52bf45042bac755aa6f",
+        "android_client_info": {
+          "package_name": "com.example.gutterguard_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANoe0Ux7P2SkJxCzhPwdUu-QqcJPUyWJw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
