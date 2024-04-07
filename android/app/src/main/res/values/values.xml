@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="google_app_id">1:122381802302:android:51e52bf45042bac755aa6f</string>
+    <string name="project_id">dp-gutterguard</string>
+    <string name="storage_bucket">gs://dp-gutterguard.appspot.com</string>
+    <string name="location_id">dp-gutterguard</string>
+    <string name="firebase_database_url">https://dp-gutterguard-default-rtdb.asia-southeast1.firebasedatabase.app/</string>
+    <string name="gcm_defaultSenderId">122381802302	</string>
+    <string name="google_api_key">AIzaSyANoe0Ux7P2SkJxCzhPwdUu-QqcJPUyWJw</string>
+    <!-- Add other Firebase configuration values as needed -->
+</resources>

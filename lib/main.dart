@@ -1,12 +1,19 @@
-import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'my_tasks.dart';
-import 'about.dart';
-import 'home.dart';
+import 'package:flutter/material.dart';
+import 'firebase_data.dart';
+// import 'notifications.dart';
+import 'user_manual.dart';
 import 'locations.dart';
-// import 'settings.dart';
+import 'history.dart';
+import 'home.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await initializeFirebaseAndFetchData();
+  // notifications.initialize();
   runApp(const MyApp());
 }
 
@@ -15,21 +22,58 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'GutterGuard',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.orangeAccent),
-        useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(),
-      ),
-      home: const MyHomePage(),
+    return FutureBuilder<Map<String, dynamic>>(
+      future: fetchGutterLocations(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: Text('Error loading data: ${snapshot.error}'),
+              ),
+            ),
+          );
+        } else {
+          List<GutterLocation> gutterLocations = List<GutterLocation>.from(snapshot.data!['locations']);
+          return MaterialApp(
+            title: 'GutterGuard',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.orangeAccent),
+              useMaterial3: true,
+              textTheme: GoogleFonts.poppinsTextTheme(),
+            ),
+            home: MyHomePage(
+            gutterLocations: gutterLocations,
+            pendingCount: snapshot.data!['pendingCount'],
+            inProgressCount: snapshot.data!['inProgressCount'],
+            ),
+          );
+        }
+      }
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  final List<GutterLocation> gutterLocations;
+  final int pendingCount;
+  final int inProgressCount;
+
+  const MyHomePage({
+    super.key,
+    required this.gutterLocations,
+    required this.pendingCount,
+    required this.inProgressCount,
+  });
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -39,12 +83,18 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentPageIndex = 0;
   late PageController _pageController;
 
-  final List<String> pageTitles = ['Home', 'Locations', 'About'];
+  final List<String> pageTitles = ['Home', 'Device Locations', 'History', 'User Manual'];
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentPageIndex);
+    _checkConnectivity((widget) {
+      showDialog(
+        context: context,
+        builder: (context) => widget,
+      );
+    });
   }
 
   @override
@@ -72,51 +122,66 @@ class _MyHomePageState extends State<MyHomePage> {
             _currentPageIndex = index;
           });
         },
-        children: const [
-          HomeContent(),
-          LocationsPage(),
-          AboutPage(),
-          // MyTasksPage(),
-          // SettingsPage(),
+        children: [
+          HomeContent(gutterLocations: widget.gutterLocations),
+          const LocationsPage(),
+          const MaintenanceHistory(),
+          const UserManualPage(),
         ],
       ),
       bottomNavigationBar: SizedBox(
-      height: 65.0, // Adjust the height as needed
-      child: BottomNavigationBar(
-        currentIndex: _currentPageIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.place),
-            label: 'Locations',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info),
-            label: 'About',
-          ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.check_box),
-          //   label: 'My Tasks',
-          // ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.settings),
-          //   label: 'Settings',
-          // ),
-        ],
-        selectedItemColor: Colors.orangeAccent,
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        onTap: (index) {
-          _pageController.jumpToPage(index);
-        },
+        height: 65.0,
+        child: BottomNavigationBar(
+          currentIndex: _currentPageIndex,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.place),
+              label: 'Device Locations',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.history),
+              label: 'Maintenance History',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.info),
+              label: 'User Manual',
+            ),
+          ],
+          selectedItemColor: Colors.orangeAccent,
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          onTap: (index) {
+            _pageController.jumpToPage(index);
+          },
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
+  Future<void> _checkConnectivity(void Function(Widget) showDialogCallback) async {
+    List<ConnectivityResult> connectivityResults = await Connectivity().checkConnectivity();
+    if (connectivityResults.contains(ConnectivityResult.none)) {
+      showDialogCallback(
+        AlertDialog(
+          title: const Text('No Internet Connection'),
+          content: const Text('Please check your internet connection and try again.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   void dispose() {

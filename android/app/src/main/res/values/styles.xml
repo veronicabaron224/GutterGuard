@@ -6,6 +6,7 @@
              the Flutter engine draws its first frame -->
         <item name="android:windowBackground">@drawable/launch_background</item>
     </style>
+    
     <!-- Theme applied to the Android Window as soon as the process has started.
          This theme determines the color of the Android Window while your
          Flutter UI initializes, as well as behind your Flutter UI while its
@@ -14,5 +15,23 @@
          This Theme is only used starting with V2 of Flutter's Android embedding. -->
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
+    </style>
+    
+    <!-- Style for FCM notification text appearance -->
+    <style name="NotificationText">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    
+    <!-- Style for FCM notification large icon -->
+    <style name="NotificationLargeIcon">
+        <!-- Set your large icon drawable here -->
+        <item name="android:src">@drawable/ic_notification_large</item>
+    </style>
+    
+    <!-- Style for FCM notification small icon -->
+    <style name="NotificationSmallIcon">
+        <!-- Set your small icon drawable here -->
+        <item name="android:src">@drawable/ic_notification_small</item>
     </style>
 </resources>
