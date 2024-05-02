@@ -1,21 +1,30 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
+import 'local_notifications.dart';
 import 'firebase_data.dart';
-// import 'notifications.dart';
 import 'user_manual.dart';
 import 'locations.dart';
-import 'history.dart';
 import 'home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    logger.severe('Error initializing Firebase: $e');
+  }
+  
+  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+  LocalNotificationService().initNotification();
   await initializeFirebaseAndFetchData();
-  // notifications.initialize();
   runApp(const MyApp());
 }
+
+Future backgroundHandler(RemoteMessage msg) async {}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -82,13 +91,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentPageIndex = 0;
   late PageController _pageController;
+  final _selectedMaintenanceFilter = 'All';
 
-  final List<String> pageTitles = ['Home', 'Device Locations', 'History', 'User Manual'];
+  final List<String> pageTitles = ['Home', 'Device Locations', 'User Manual'];
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentPageIndex);
+
     _checkConnectivity((widget) {
       showDialog(
         context: context,
@@ -124,8 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         children: [
           HomeContent(gutterLocations: widget.gutterLocations),
-          const LocationsPage(),
-          const MaintenanceHistory(),
+          LocationsPage(selectedMaintenanceFilter: _selectedMaintenanceFilter),
           const UserManualPage(),
         ],
       ),
@@ -141,10 +151,6 @@ class _MyHomePageState extends State<MyHomePage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.place),
               label: 'Device Locations',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history),
-              label: 'Maintenance History',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.info),

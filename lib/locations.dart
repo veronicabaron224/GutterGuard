@@ -1,33 +1,34 @@
+// ignore_for_file: no_logic_in_create_state
+
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:location/location.dart';
 import 'firebase_data.dart';
 
 final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 final Logger _logger = Logger('GutterLocations');
 
-void main() {
-  runApp(const LocationsPage());
-}
-
 class LocationsPage extends StatefulWidget {
   final String? selectedMaintenanceFilter;
-  const LocationsPage({super.key, this.selectedMaintenanceFilter = 'All'});
+  const LocationsPage({super.key, this.selectedMaintenanceFilter});
 
   @override
-  LocationsPageState createState() => LocationsPageState();
+  LocationsPageState createState() => LocationsPageState(selectedMaintenanceFilter);
 }
 
 class LocationsPageState extends State<LocationsPage> {
   late Future<void> _dataLoadingFuture;
   String selectedStatusFilter = 'All';
-  String selectedMaintenanceFilter = 'All';
+  String? selectedMaintenanceFilter;
   List<GutterLocation> gutterLocations = [];
   final List<String> statusFilters = ['All', 'Clogged', 'Clear'];
   final List<String> maintenanceFilters = ['All', 'Pending', 'In progress', 'No maintenance required'];
   TextEditingController searchController = TextEditingController();
+
+  LocationsPageState(this.selectedMaintenanceFilter);
 
   @override
   void initState() {
@@ -110,7 +111,7 @@ class LocationsPageState extends State<LocationsPage> {
 
       values.forEach((deviceId, deviceData) {
         bool isClogged = false;
-        DateTime latestTimestamp = DateTime(1970); // Initialize with a past date
+        DateTime latestTimestamp = DateTime(1970);
         deviceData['isClogged'].forEach((timestamp, cloggedValue) {
           DateTime currentTimestamp = parseTimestamp(timestamp);
           if (currentTimestamp.isAfter(latestTimestamp)) {
@@ -120,6 +121,7 @@ class LocationsPageState extends State<LocationsPage> {
         });
 
         locations.add(GutterLocation(
+          deviceID: deviceId,
           name: deviceData['name'],
           address: deviceData['address'],
           latitude: deviceData['latitude'],
@@ -204,7 +206,7 @@ class LocationsPageState extends State<LocationsPage> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(21),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,15 +282,11 @@ class LocationsPageState extends State<LocationsPage> {
       children: [
         Expanded(
           child: gutterLocations.isEmpty
-            ? const Center(
-                child: Text(
-                  'You have no devices to display', // IF DB HAS NO LOCATIONS. DI PA TO NAGANA NG MAAYOS
-                  style: TextStyle(fontSize: 16.0),
-                ),
-              )
+            ? const Center(child: CircularProgressIndicator())
             : Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            padding: const EdgeInsets.symmetric(horizontal: 19.0),
             child: ListView.builder(
+              shrinkWrap: true,
               itemCount: gutterLocations.length,
               itemBuilder: (BuildContext context, int index) {
                 final location = gutterLocations[index];
@@ -314,13 +312,14 @@ class LocationsPageState extends State<LocationsPage> {
                       Icons.location_pin,
                       size: 35,
                     ),
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => GutterDetailsPage(location: location),
                         ),
                       );
+                      await _refreshLocations();
                     },
                   );
                 } else {
@@ -344,83 +343,203 @@ class GutterDetailsPage extends StatefulWidget {
 }
 
 class GutterDetailsPageState extends State<GutterDetailsPage> {
-  String comment = '';
+  String selectedMaintenanceStatus = '';
+
+  @override
+  void initState() {
+    super.initState();
+    selectedMaintenanceStatus = getStatusFromText(widget.location.maintenanceStatus);
+  }
 
   @override
   Widget build(BuildContext context) {
-    String maintenanceStatusText = '';
-
-    if (widget.location.maintenanceStatus.toLowerCase().contains('pending')) {
-      maintenanceStatusText = 'Pending';
-    } else if (widget.location.maintenanceStatus.toLowerCase().contains('inprogress')) {
-      maintenanceStatusText = 'In progress';
-    } else if (widget.location.maintenanceStatus.toLowerCase().contains('nomaintenancereq')) {
-      maintenanceStatusText = 'No maintenance required';
+    Color markerColor = Colors.transparent;
+    if (widget.location.maintenanceStatus == 'pending') {
+      markerColor = Colors.red;
+    } else if (widget.location.maintenanceStatus == 'inprogress') {
+      markerColor = Colors.yellow;
+    } else if (widget.location.maintenanceStatus == 'nomaintenancereq') {
+      markerColor = Colors.green;
     }
     
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.location.name),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            flex: 2,
-            child: FlutterMap(
-              options: MapOptions(
-                initialCenter: LatLng(widget.location.latitude, widget.location.longitude),
-                initialZoom: 17,
-                cameraConstraint: CameraConstraint.contain(
-                  bounds: LatLngBounds(
-                    // LatLng(widget.location.latitude - 0.003, widget.location.longitude - 0.003),
-                    // LatLng(widget.location.latitude + 0.003, widget.location.longitude + 0.003),
-                    const LatLng(14.4137, 120.9384), // Southwest coordinate (Manila)
-                    const LatLng(14.7176, 121.1077), // Northeast coordinate (Manila)
-                  ),
-                ),
-                interactionOptions: const InteractionOptions(
-                  // flags: ~InteractiveFlag.rotate,
-                ),
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      width: 40.0,
-                      height: 40.0,
-                      point: LatLng(widget.location.latitude, widget.location.longitude),
-                      child: const Icon(
-                        Icons.location_pin,
-                        color: Colors.pink,
-                        size: 40.0,
+      body: FutureBuilder<LocationData>(
+        future: _getLocation(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error fetching location: ${snapshot.error}'));
+          } else {
+            final currentLocation = snapshot.data!;
+            return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 2,
+                child: FlutterMap(
+                  options: MapOptions(
+                    initialCenter: LatLng(widget.location.latitude, widget.location.longitude),
+                    initialZoom: 17,
+                    cameraConstraint: CameraConstraint.contain(
+                      bounds: LatLngBounds(
+                        // LatLng(widget.location.latitude - 0.003, widget.location.longitude - 0.003),
+                        // LatLng(widget.location.latitude + 0.003, widget.location.longitude + 0.003),
+                        const LatLng(14.4137, 120.9384), // Southwest coordinate (Manila)
+                        const LatLng(14.7176, 121.1077), // Northeast coordinate (Manila)
                       ),
+                    ),
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          width: 60.0,
+                          height: 60.0,
+                          point: LatLng(currentLocation.latitude!, currentLocation.longitude!),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('You', style: TextStyle(color: Colors.black, fontSize: 12.0, fontWeight: FontWeight.bold)),
+                              Icon(Icons.location_pin, color: Colors.blue, size: 40.0)
+                            ],
+                          ),
+                        ),
+                        Marker(
+                          width: 100.0,
+                          height: 60.0,
+                          point: LatLng(widget.location.latitude, widget.location.longitude),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(widget.location.name, style: const TextStyle(color: Colors.black, fontSize: 12.0, fontWeight: FontWeight.bold)),
+                              Icon(Icons.location_pin, color: markerColor, size: 40.0)
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Address: ${widget.location.address}'),
-                  Text('Status: ${widget.location.isClogged ? 'Clogged' : 'Clear'}'),
-                  Text('Maintenance: $maintenanceStatusText'),
-                ],
               ),
-            ),
-          ),
-        ],
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Address:', style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(widget.location.address)),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Status:', style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(widget.location.isClogged ? 'Clogged' : 'Clear')),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Maintenance Status:', style: TextStyle(fontWeight: FontWeight.bold)),
+                          DropdownButtonFormField<String>(
+                            value: selectedMaintenanceStatus,
+                            items: ['Pending', 'In progress', 'No maintenance required']
+                              .map((String status) {
+                                return DropdownMenuItem<String>(
+                                  value: status,
+                                  child: Text(status),
+                                );
+                              }).toList(),
+                            onChanged: ((String? value) {
+                              if (value != null) {
+                                setState(() {
+                                  selectedMaintenanceStatus = value;
+                                  saveMaintenanceStatus(getTextFromStatus(selectedMaintenanceStatus));
+                                });
+                              }
+                            }),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+      },
+    ),
+  );
+}
+  
+  String getStatusFromText(String text) {
+    if (text.toLowerCase().contains('pending')) {
+      return 'Pending';
+    } else if (text.toLowerCase().contains('inprogress')) {
+      return 'In progress';
+    } else if (text.toLowerCase().contains('nomaintenancereq')) {
+      return 'No maintenance required';
+    } else {
+      return '';
+    }
+  }
+
+  String getTextFromStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'pending';
+      case 'in progress':
+        return 'inprogress';
+      case 'no maintenance required':
+        return 'nomaintenancereq';
+      default:
+        return '';
+    }
+  }
+
+  Future<void> saveMaintenanceStatus(String maintenanceStatus) async {
+    try {
+      // Check if the location's deviceID is not empty before saving
+      if (widget.location.deviceID.isNotEmpty) {
+        DatabaseReference ref = FirebaseDatabase.instance.ref().child('GutterLocations/${widget.location.deviceID}/maintenanceStatus');
+        await ref.set(maintenanceStatus);
+        showSnackBar('Maintenance status saved successfully');
+      } else {
+        showSnackBar('Error: Device ID is empty');
+      }
+    } catch (error) {
+      showSnackBar('Error saving maintenance status: $error');
+    }
+  }
+
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
       ),
     );
+  }
+  
+  Future<LocationData> _getLocation() async {
+    Location location = Location();
+    return location.getLocation();
   }
 
   String getMaintenanceStatusText(String status) {

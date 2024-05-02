@@ -145,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  file:
+    dependency: transitive
+    description:
+      name: file
+      sha256: "1b92bec4fc2a72f59a8e15af5f52cd441e4a7860b49499d69dfa817af20e925d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.4"
   firebase_core:
     dependency: "direct main"
     description:
@@ -238,6 +246,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  flutter_local_notifications:
+    dependency: "direct main"
+    description:
+      name: flutter_local_notifications
+      sha256: "293995f94e120c8afce768981bd1fa9c5d6de67c547568e3b42ae2defdcbb4a0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "13.0.0"
+  flutter_local_notifications_linux:
+    dependency: transitive
+    description:
+      name: flutter_local_notifications_linux
+      sha256: ccb08b93703aeedb58856e5637450bf3ffec899adb66dc325630b68994734b89
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0+1"
+  flutter_local_notifications_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_local_notifications_platform_interface
+      sha256: "5ec1feac5f7f7d9266759488bc5f76416152baba9aa1b26fe572246caa00d1ab"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.0"
   flutter_map:
     dependency: "direct main"
     description:
@@ -336,6 +368,31 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  location:
+    dependency: "direct main"
+    description:
+      path: "packages/location"
+      ref: V4
+      resolved-ref: "44745026a384c743cb5e64f94296303d9adbb237"
+      url: "https://github.com/781flyingdutchman/flutterlocation.git"
+    source: git
+    version: "4.4.1"
+  location_platform_interface:
+    dependency: transitive
+    description:
+      name: location_platform_interface
+      sha256: "62eeaf1658e92e4459b727f55a3c328eccbac8ba043fa6d262ac5286ad48384c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.0"
+  location_web:
+    dependency: transitive
+    description:
+      name: location_web
+      sha256: "6c08c408a040534c0269c4ff9fe17eebb5a36dea16512fbaf116b9c8bc21545b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.1"
   logger:
     dependency: "direct main"
     description:
@@ -496,6 +553,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  process:
+    dependency: transitive
+    description:
+      name: process
+      sha256: "53fd8db9cec1d37b0574e12f07520d582019cb6c44abf5479a01505099a34a09"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.4"
   proj4dart:
     dependency: transitive
     description:
@@ -512,6 +577,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.2"
+  rxdart:
+    dependency: "direct main"
+    description:
+      name: rxdart
+      sha256: "0c7c0cedd93788d996e33041ffecda924cc54389199cde4e6a34b440f50044cb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.27.7"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -565,6 +638,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.1"
+  timezone:
+    dependency: transitive
+    description:
+      name: timezone
+      sha256: "1cfd8ddc2d1cfd836bc93e67b9be88c3adaeca6f40a00ca999104c30693cdca0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.2"
   typed_data:
     dependency: transitive
     description:
@@ -681,10 +762,10 @@ packages:
     dependency: transitive
     description:
       name: xdg_directories
-      sha256: faea9dee56b520b55a566385b84f2e8de55e7496104adada9962e0bd11bcff1d
+      sha256: bd512f03919aac5f1313eb8249f223bacf4927031bf60b02601f81f687689e86
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.4"
+    version: "0.2.0+3"
   xml:
     dependency: transitive
     description:

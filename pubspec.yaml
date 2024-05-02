@@ -1,6 +1,7 @@
 name: gutterguard_flutter
 description: "A Flutter mobile application project for GutterGuard devices."
 version: 1.0.0+1
+publish_to: none
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
@@ -20,6 +21,13 @@ dependencies:
   connectivity_plus: ^6.0.1
   firebase_messaging: ^14.7.19
   provider: ^6.1.2
+  location:
+    git:
+        url: https://github.com/781flyingdutchman/flutterlocation.git
+        ref: V4
+        path: packages/location
+  rxdart: ^0.27.7
+  flutter_local_notifications: ^13.0.0
 
 dev_dependencies:
   flutter_test:
@@ -29,8 +37,8 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: true
-  image_path: "assets/ic_gutterguard_white.png"
-  icon_background: "#f7931e"
+  image_path: "assets/ic_gutterguard.png"
+  # adaptive_icon_background: "#f7931e"
 
 flutter:
   uses-material-design: true

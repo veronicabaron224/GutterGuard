@@ -7,7 +7,7 @@ class UserManualPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: DefaultTabController(
-        length: 3,
+        length: 2,
         child: Scaffold(
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(50.0),
@@ -20,7 +20,6 @@ class UserManualPage extends StatelessWidget {
                   tabs: [
                     Tab(text: 'Home'),
                     Tab(text: 'Locations'),
-                    Tab(text: 'History'),
                   ],
                 ),
               ),
@@ -39,12 +38,6 @@ class UserManualPage extends StatelessWidget {
                 content: 'The Device Locations page provides detailed information about each GutterGuard device installed.'
                 '\n\n- List of Devices: Displays a list of all GutterGuard devices installed, along with their details such as location, clog status, and maintenance status.'
                 '\n- Details View: Tap on a device to view its detailed information, including its exact location on the map, clog status, and maintenance history.',
-              ),
-              _buildTabContent(
-                title: 'History',
-                content: 'The History page allows you to track maintenance status updates and clog status updates over time.'
-                '\n\n- Maintenance History: Displays a chronological list of maintenance status updates for each GutterGuard device.'
-                '\n- Clog Status History: Tracks clog occurrences and resolutions for each device.',
               ),
             ],
           ),

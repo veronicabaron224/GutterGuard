@@ -1,11 +1,17 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
+import 'package:rxdart/rxdart.dart';
+import 'local_notifications.dart';
+import 'firebase_options.dart';
 
 final Logger logger = Logger('FirebaseData');
+final _messageStreamController = BehaviorSubject<RemoteMessage>();
 
 class GutterLocation {
+  final String deviceID;
   final String name;
   final String address;
   final String maintenanceStatus;
@@ -14,6 +20,7 @@ class GutterLocation {
   final bool isClogged;
 
   GutterLocation({
+    required this.deviceID,
     required this.name,
     required this.address,
     required this.latitude,
@@ -34,6 +41,9 @@ DateTime parseTimestamp(String timestamp) {
 }
 
 List<GutterLocation> gutterLocations = [];
+int previousIsCloggedCount = 0;
+int previousInProgressCount = 0;
+bool isMaintenanceStatusLocked = false;
 
 Future<void> initializeFirebaseAndFetchData() async {
   try {
@@ -43,6 +53,45 @@ Future<void> initializeFirebaseAndFetchData() async {
   } catch (error) {
     logger.severe("Error initializing Firebase or fetching gutter locations: $error");
   }
+
+  final messaging = FirebaseMessaging.instance;
+
+  final settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  if (kDebugMode) {
+    print('Permission granted: ${settings.authorizationStatus}');
+  }
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    if (kDebugMode) {
+      print('Handling a foreground message: ${message.messageId}');
+      print('Message data: ${message.data}');
+      print('Message notification: ${message.notification?.title}');
+      print('Message notification: ${message.notification?.body}');
+    }
+
+    _messageStreamController.sink.add(message);
+  });
+
+  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+    await Firebase.initializeApp();
+
+    if (kDebugMode) {
+      print("Handling a background message: ${message.messageId}");
+      print('Message data: ${message.data}');
+      print('Message notification: ${message.notification?.title}');
+      print('Message notification: ${message.notification?.body}');
+    }
+  }
+   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 }
 
 Future<Map<String, dynamic>> fetchGutterLocations() async {
@@ -54,7 +103,7 @@ Future<Map<String, dynamic>> fetchGutterLocations() async {
 
     values.forEach((deviceId, deviceData) {
       bool isClogged = false;
-      DateTime latestTimestamp = DateTime(1970); // Initialize with a past date
+      DateTime latestTimestamp = DateTime(1970);
       deviceData['isClogged'].forEach((timestamp, cloggedValue) {
         DateTime currentTimestamp = parseTimestamp(timestamp);
         if (currentTimestamp.isAfter(latestTimestamp)) {
@@ -63,19 +112,38 @@ Future<Map<String, dynamic>> fetchGutterLocations() async {
         }
       });
 
+      String maintenanceStatus = deviceData['maintenanceStatus'];
+
+      if (isClogged && maintenanceStatus == 'nomaintenancereq') {
+        maintenanceStatus = 'pending';
+        ref.child('$deviceId/maintenanceStatus').set(maintenanceStatus);
+      }
+
       locations.add(GutterLocation(
+        deviceID: deviceId,
         name: deviceData['name'],
         address: deviceData['address'],
         latitude: deviceData['latitude'],
         longitude: deviceData['longitude'],
         isClogged: isClogged,
-        maintenanceStatus: deviceData['maintenanceStatus'],
+        maintenanceStatus: maintenanceStatus,
       ));
     });
 
     gutterLocations = locations;
     int pendingCount = gutterLocations.where((location) => location.maintenanceStatus == 'pending').length;
     int inProgressCount = gutterLocations.where((location) => location.maintenanceStatus == 'inprogress').length;
+    int isCloggedCount = gutterLocations.where((location) => location.isClogged).length;
+
+    if (isCloggedCount > 0 && isCloggedCount != previousIsCloggedCount) {
+      LocalNotificationService().showNotification(title: 'Gutter Maintenance Alert', body: '$isCloggedCount gutters require maintenance due to blockage. Please address promptly');
+      previousIsCloggedCount = isCloggedCount;
+    }
+
+    if (inProgressCount > 0 && inProgressCount != previousInProgressCount) {
+      LocalNotificationService().showNotification(title: 'Gutter Maintenance Ongoing', body: '$inProgressCount gutters are currently under maintenance');
+      previousInProgressCount = inProgressCount;
+    }
 
     return {
       'locations': gutterLocations,
